@@ -114,4 +114,4 @@ sources are in `src/content/learn.ts` and `docs/SOURCES.md`.
 
 ## AI use
 
-Built with help from Claude Code on specific issues. See `docs/AI-USE-LOG.md`.
+See `docs/AI-USE-LOG.md`.
