@@ -2,7 +2,7 @@
 
 Acequia Watch helps volunteer acequia stewards document fire and flood damage, even when there's no cell service. Reports can be saved in the field and synced later. The app also includes resources for people who want to learn about acequias or support them.
 
-It's an installable progressive web app (PWA) that works offline. The app has separate views for stewards, agency reviewers, administrators, and the general public.
+It's an installable progressive web app (PWA) that works offline. The app has separate views for stewards, agency reviewers, administrators, and the general public. Live demo: https://acequia-watch.vercel.app.
 
 ## What it does
 
@@ -66,7 +66,7 @@ Run selected browser suites by passing their names:
 npm run test:browser -- core packet
 ```
 
-Google Chrome is required. Set `CHROME_PATH` if Chrome is installed in a nonstandard location. Test results are recorded in `docs/TEST-LOG.md`.
+Google Chrome is required. Set `CHROME_PATH` if Chrome is installed in a nonstandard location.
 
 ## Demo and backend behavior
 
@@ -99,11 +99,11 @@ Use a separate Supabase project for demonstration data only.
 
 Do not commit `.env.local` or expose the Supabase service key.
 
-Demo accounts use the password `demo-acequia-2026`:
+Demo accounts use the password `demo-acequia-2026`. These only apply when connected to Supabase, the built-in demo uses 'Try a demo instead'.
 
-- `steward@`
-- `steward2@`
-- `agency@`
+- `steward@demo.acequiawatch.org`
+- `steward2@demo.acequiawatch.org`
+- `agency@demo.acequiawatch.org`
 - `admin@demo.acequiawatch.org`
 
 ## Deploy
@@ -131,12 +131,12 @@ src/
 supabase/       Database schema and security tests
 scripts/        Browser tests, seeding, data refresh, and icons
 public/         Static assets and saved map data
-docs/           Test logs, decisions, sources, and AI-use log
+docs/           Sources, and AI-use log
 ```
 
 ## Data sources
 
-Acequia line and headgate data comes from the New Mexico Office of the State Engineer's EDAC resources. The saved data in `public/data/` is incomplete and should not be treated as a comprehensive inventory.
+Acequia line and headgate data comes from the New Mexico Office of the State Engineer and UNM's Earth Data Analysis Center (EDAC). The saved data in `public/data/` is incomplete and should not be treated as a comprehensive inventory.
 
 Refresh the data with:
 
