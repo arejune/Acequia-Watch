@@ -1,117 +1,151 @@
 # Acequia Watch
 
-Acequia Watch helps volunteer acequia stewards record fire and flood damage
-with no signal, and share it with agencies when their acequia agrees. Its
-public side is for anyone who wants to learn about acequias or help them.
+Acequia Watch helps volunteer acequia stewards document fire and flood damage, even when there's no cell service. Reports can be saved in the field and synced later. The app also includes resources for people who want to learn about acequias or support them.
 
-It is one installable web app (a PWA) that runs full screen and offline. The
-first screen asks who you are:
+It's an installable progressive web app (PWA) that works offline. The app has separate views for stewards, agency reviewers, administrators, and the general public.
 
-- **Steward** (`/steward`): log damage with a photo, GPS, severity and a cost range with no signal; sync later with no duplicates; see which structures nobody has checked, closest to damage first; share an event with agencies; print a damage packet.
-- **Agency reviewer** (`/agency`): shared reports on a map, low/likely/high cost totals, coverage, gaps, CSV export.
-- **Admin** (`/admin`): approve new accounts, manage events and acequias.
-- **Everyone else** (no account): `/explore`, `/learn` (a source on every fact), `/act` (issues, the 2026 acequia bills, programs, a letter builder) and `/play` (*Turno*, an arcade game about running the compuertas).
+## What it does
 
-It does **not** submit anything to DHSEM, FEMA or the Interstate Stream
-Commission, and is not endorsed by NMAA. All demo data is fictional.
+- **Steward** (`/steward`): Record damage with photos, GPS, severity, and estimated costs. Save reports offline, sync them later without duplicates, check which structures still need inspection, share reports with agencies, and generate damage packets.
+- **Agency reviewer** (`/agency`): View shared reports on a map, review cost estimates and inspection coverage, identify gaps, and export data as CSV.
+- **Admin** (`/admin`): Approve accounts and manage events and acequias.
+- **Public** (`/explore`, `/learn`, `/act`, `/play`): Explore acequia information, read educational material with sources, browse legislation and programs, draft letters, and play *Turno*, an arcade game about operating irrigation gates.
 
-## Run it
+Acequia Watch does **not** submit reports directly to DHSEM, FEMA, or the Interstate Stream Commission, and it is not endorsed by NMAA. All demonstration records are fictional.
 
-Needs Node 22.18 or newer.
+## Run locally
+
+Requires Node.js 22.18 or newer.
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev
 ```
 
-No setup or keys needed. Without Supabase keys the app runs on a demo server
-inside the browser, seeded with made-up data. On the sign-in screen, open
-**Try a demo** and pick a role.
+Open the address printed by Vite, usually `http://localhost:5173`.
 
-To try it on your phone, run `npm run dev:phone` and open the `Network:`
-address it prints (same Wi-Fi). GPS, install and offline need HTTPS, so test
-those on a deployed link.
+The app runs without Supabase credentials using an in-browser demo backend seeded with fictional data. On the sign-in screen, select **Try a demo** and choose a role.
 
-## Test it
+To test on a phone, run:
 
 ```bash
-npm test               # 61 unit and security tests (sync engine, gaps, totals, CSV, game, row-level security)
-npm run test:browser   # end-to-end in Chrome at phone size
+npm run dev:phone
 ```
 
-`test:browser` starts its own server and runs these suites (pick some with
-`npm run test:browser -- core packet`):
+Open the network address printed in the terminal from a device on the same Wi-Fi network. GPS, installation, and offline behavior should be tested over HTTPS on a deployed site.
 
-| Suite | Checks |
+## Tests
+
+Run the unit and security tests with:
+
+```bash
+npm test
+```
+
+Run the browser tests with:
+
+```bash
+npm run test:browser
+```
+
+The test suite covers synchronization, inspection gaps, cost totals, CSV exports, game logic, and database access policies. Browser tests run end-to-end checks in Chrome.
+
+| Suite | What it checks |
 |---|---|
-| `core` | a steward reports offline with a photo, reconnects, syncs, no duplicates |
-| `quick` | camera-first quick report, offline |
-| `packet` | packet photos online and offline, PDF pages and size, refusals for other stewards |
-| `tour` | guided tours stay on screen; create account → admin approves → sign in |
-| `phone` | every route at 3 phone sizes: no sideways scroll, tap targets ≥ 44 px, no errors |
-| `a11y` | axe-core WCAG 2.1 A/AA on every screen |
-| `offline` | production build opens with no network after one visit |
+| `core` | Creating a report offline, reconnecting, and syncing without duplicates |
+| `quick` | The quick-report workflow when offline |
+| `packet` | Packet generation, photos, PDF output, and access restrictions |
+| `tour` | Guided tours and account approval |
+| `phone` | Layout and interaction checks at three phone sizes |
+| `a11y` | Automated accessibility checks using axe-core |
+| `offline` | Opening the production build without a network connection after an initial visit |
 
-It needs Google Chrome; set `CHROME_PATH` if it isn't in the usual place.
-Results go in `docs/TEST-LOG.md`.
+Run selected browser suites by passing their names:
 
-## What's real and what's simulated
+```bash
+npm run test:browser -- core packet
+```
 
-- **The demo** runs on the in-browser server, and access rules there are **simulated**.
-- **The security model** is real Postgres row-level security in `supabase/schema.sql`, tested against real Postgres with PGlite (`supabase/rls.test.ts`). No live Supabase project has been tested yet.
-- **The demo data is made up** and placed in the San Pedro Parks Wilderness, where there are no real structures. Dashboard totals are synthetic, not findings.
+Google Chrome is required. Set `CHROME_PATH` if Chrome is installed in a nonstandard location. Test results are recorded in `docs/TEST-LOG.md`.
 
-## Connect Supabase (optional, demo project only)
+## Demo and backend behavior
 
-1. Create a Supabase project used **only** for fake demo data.
-2. In the SQL editor, run `supabase/schema.sql`.
-3. Under Authentication → URL configuration, add your deployed URL (for magic links).
-4. Seed it. The service key stays on your machine:
+The app has two backend modes:
+
+- **Demo backend:** Runs in the browser and uses simulated access rules and fictional data.
+- **Supabase backend:** Uses Postgres row-level security policies defined in `supabase/schema.sql`. The policies are tested against Postgres using PGlite, but the repository has not yet been tested against a live Supabase project.
+
+The seeded demonstration data is placed in the San Pedro Parks Wilderness, where the mapped records do not represent actual acequia infrastructure. Dashboard totals and sample incidents are fictional.
+
+## Connect Supabase (optional)
+
+Use a separate Supabase project for demonstration data only.
+
+1. Create a Supabase project.
+2. Run `supabase/schema.sql` in the SQL editor.
+3. Under Authentication → URL Configuration, add the deployed app URL if using magic links.
+4. Seed the project from your local environment:
+
    ```bash
    SUPABASE_URL=https://xxx.supabase.co SUPABASE_SERVICE_KEY=... npm run seed:supabase
    ```
-5. Create `.env.local` (gitignored) with only the public values:
-   ```
+
+5. Create a `.env.local` file with the public configuration values:
+
+   ```bash
    VITE_SUPABASE_URL=https://xxx.supabase.co
    VITE_SUPABASE_ANON_KEY=...
    ```
 
-Demo logins (password `demo-acequia-2026`): `steward@`, `steward2@`, `agency@`
-and `admin@demo.acequiawatch.org`.
+Do not commit `.env.local` or expose the Supabase service key.
+
+Demo accounts use the password `demo-acequia-2026`:
+
+- `steward@`
+- `steward2@`
+- `agency@`
+- `admin@demo.acequiawatch.org`
 
 ## Deploy
 
-Any static host with HTTPS. Build command `npm run build`, output `dist`.
-`vercel.json` and `public/_redirects` already send every path to
-`index.html`. Set the two `VITE_` variables in the host's settings if you use
-Supabase.
+The app can be deployed to a static host that supports HTTPS.
 
-## Layout
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
 
-```
+The repository includes `vercel.json` and `public/_redirects` for client-side routing. If using Supabase, configure the two `VITE_` environment variables in the hosting provider's settings.
+
+## Project structure
+
+```text
 src/
-  app/          screens, one folder per side (steward, agency, community, learn, packet)
-  components/   shared UI: map, photo and location fields, tour, sheets
-  content/      Learn facts, issues, bills and programs as data, each with a source
-  db/           IndexedDB schema, outbox and sync engine, backends (Supabase, in-browser)
-  lib/          geo, photo compression, totals, gap detection, CSV
-  game/         Turno rules (pure functions, unit tested)
-  config/       labels, severity scale, packet layout
-  demo/         made-up seed data
-  styles.css    all styles
-supabase/       schema.sql (tables and row-level security) and its tests
-scripts/        browser tests, Supabase seeding, State Engineer data refresh, icons
-public/         icons and the saved State Engineer acequia map data
-docs/           test log, decisions, sources, AI use log
+  app/          Application screens
+  components/   Shared interface components
+  content/      Educational material, issues, bills, and programs
+  db/           IndexedDB, synchronization, and backend implementations
+  lib/          Geographic utilities, photo processing, totals, gap detection, CSV
+  game/         Turno game logic
+  config/       Labels, severity scales, and packet layout
+  demo/         Fictional seed data
+  styles.css    Global styles
+supabase/       Database schema and security tests
+scripts/        Browser tests, seeding, data refresh, and icons
+public/         Static assets and saved map data
+docs/           Test logs, decisions, sources, and AI-use log
 ```
 
 ## Data sources
 
-Acequia lines and headgates come from the Office of the State Engineer (EDAC),
-saved in `public/data/` as-is and incomplete. Refresh them with
-`node scripts/fetch-ose.mjs`. Base map © OpenStreetMap contributors. Fact
-sources are in `src/content/learn.ts` and `docs/SOURCES.md`.
+Acequia line and headgate data comes from the New Mexico Office of the State Engineer's EDAC resources. The saved data in `public/data/` is incomplete and should not be treated as a comprehensive inventory.
+
+Refresh the data with:
+
+```bash
+node scripts/fetch-ose.mjs
+```
+
+Base map data © OpenStreetMap contributors. Sources for educational content are maintained in `src/content/learn.ts` and `docs/SOURCES.md`.
 
 ## AI use
 
-See `docs/AI-USE-LOG.md`.
+See [`docs/AI-USE-LOG.md`](docs/AI-USE-LOG.md) for a record of AI assistance during development.
